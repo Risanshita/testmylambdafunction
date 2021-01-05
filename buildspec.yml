@@ -1,0 +1,22 @@
+version: 0.2
+env:
+  variables:
+    DOTNET_ROOT: /root/.dotnet
+phases:
+  install:
+    runtime-versions:
+      dotnet: 3.1
+  pre_build:
+    commands:
+      - echo Restore started on `date`
+      - export PATH="$PATH:/root/.dotnet/tools"
+      - pip install --upgrade awscli
+      - cd AWSServerlessLamdaTest
+      - dotnet clean 
+      - dotnet restore
+  build:
+    commands:
+      - echo Build started on `date`
+      - dotnet new -i Amazon.Lambda.Templates::*
+      - dotnet tool install -g Amazon.Lambda.Tools --version 4.3.0
+      - dotnet lambda deploy-function "AWSServerlessLamdaTest" --function-role "arn:aws:iam::awsaccountnumber:role/testlambdarole" --region "us-east-1"
